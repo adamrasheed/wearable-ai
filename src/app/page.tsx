@@ -1,103 +1,198 @@
-import Image from "next/image";
+"use client";
+import { ChevronRight } from "lucide-react";
+import { handleTextareaSubmission } from "./actions";
+import { cn } from "@/lib/utils";
+import { useState, useTransition } from "react";
+import { translations } from "@/lib/translations";
+import { type ClothingRecommendation as ClothingRecommendationType } from "@/types";
+import { ClothingRecommendation } from "@/app/components";
+
+const mockClothingRecommendation: ClothingRecommendationType[] = [
+  {
+    date: "2024-05-08",
+    clothing: {
+      casual: "T-shirt and shorts",
+      work: "Short-sleeve button-up and chinos",
+      formal: "Lightweight suit with a breathable shirt",
+    },
+    rationale: "It's a clear day with warm temperatures reaching 79°F.",
+  },
+  {
+    date: "2024-05-09",
+    clothing: {
+      casual: "Light sweater over a T-shirt and jeans",
+      work: "Smart casual with a blazer and dress pants",
+      formal: "Dark suit with a lightweight tie",
+    },
+    rationale:
+      "The day will be partly cloudy with comfortable temperatures around 77°F.",
+  },
+  {
+    date: "2024-05-10",
+    clothing: {
+      casual: "Tank top and shorts",
+      work: "Lightweight blouse and slacks",
+      formal: "Light-colored suit with a dress shirt",
+    },
+    rationale: "A clear day with a high of 83°F, perfect for light clothing.",
+  },
+  {
+    date: "2024-05-11",
+    clothing: {
+      casual: "Shorts and a breathable polo",
+      work: "Dress shirt with tailored shorts",
+      formal: "Summer suit with a light fabric",
+    },
+    rationale: "Expect a clear day with warm temps, reaching up to 86°F.",
+  },
+  {
+    date: "2024-05-12",
+    clothing: {
+      casual: "Short-sleeve shirt and light pants",
+      work: "Linen shirt with dress shorts",
+      formal: "Lightweight suit with a linen shirt",
+    },
+    rationale:
+      "Warm conditions at 85°F with clear skies indicate dress for heat.",
+  },
+  {
+    date: "2024-05-13",
+    clothing: {
+      casual: "T-shirt and shorts",
+      work: "Short-sleeve shirt and chinos",
+      formal: "Summer suit with breathable fabric",
+    },
+    rationale: "Another clear and warm day, temperatures reaching 89°F.",
+  },
+];
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [isPending, startTransition] = useTransition();
+  const [location, setLocation] = useState("Los Angeles");
+  const [clothingRecommendation, setClothingRecommendation] = useState<
+    ClothingRecommendationType[]
+  >(mockClothingRecommendation);
+  const [alternatives, setAlternatives] = useState<string[]>([
+    "Seattle",
+    "San Francisco",
+  ]);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const handleSubmit = async (formData: FormData) => {
+    setMessage(null);
+    startTransition(async () => {
+      try {
+        const result = await handleTextareaSubmission(formData);
+        if (result?.success) {
+          console.log("Location processed successfully!", result.data);
+          setMessage({
+            type: "success",
+            text: "Location processed successfully!",
+          });
+        } else if (result?.error) {
+          setMessage({ type: "error", text: result.error });
+        }
+      } catch (error) {
+        setMessage({
+          type: "error",
+          text: "An unexpected error occurred. Please try again.",
+        });
+      }
+    });
+  };
+
+  return (
+    <div className="max-w-lg mx-auto mt-8">
+      <p className="mb-4 font-bold">Where do you live?</p>
+
+      {message && (
+        <div
+          className={cn(
+            "mb-4 p-4 rounded-lg border",
+            message.type === "success"
+              ? "bg-green-50 border-green-200 text-green-800"
+              : "bg-red-50 border-red-200 text-red-800"
+          )}
+        >
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              {message.type === "success" ? (
+                <svg
+                  className="h-5 w-5 text-green-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="h-5 w-5 text-red-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              )}
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium">{message.text}</p>
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+      )}
+
+      <form
+        action={handleSubmit}
+        className="flex items-center gap-2 border-slate-300 shadow border focus:ring-2 rounded-full px-1"
+      >
+        <input
+          className="block w-full p-2 focus:outline-none"
+          name="location"
+          id="location"
+          placeholder="I live in a place with palm trees and celebrities..."
+          required
+          disabled={isPending}
+        />
+        <button
+          type="submit"
+          disabled={isPending}
+          className={cn(
+            "rounded-full p-2 cursor-pointer transition-colors flex items-center justify-center",
+            "bg-slate-500 text-white hover:bg-slate-600",
+            "focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2",
+            "disabled:opacity-50 disabled:cursor-not-allowed"
+          )}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <ChevronRight className="size-4" />
+        </button>
+      </form>
+
+      {location && (
+        <div className="mt-4">
+          <p>{translations.locationGuess(location)}</p>
+          <p>{translations.recommendationTitle}</p>
+        </div>
+      )}
+      <div className="mt-4 space-y-4">
+        {clothingRecommendation &&
+          clothingRecommendation.map((recommendation) => (
+            <ClothingRecommendation
+              key={recommendation.date}
+              {...recommendation}
+            />
+          ))}
+      </div>
     </div>
   );
 }
