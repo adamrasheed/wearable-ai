@@ -57,14 +57,13 @@ export function getFile(formData: FormData, key: string): File | null {
 
 export const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+    month: "2-digit",
+    day: "2-digit",
   });
 };
 
 export const getDayOfWeek = (date: string) => {
   return new Date(date).toLocaleDateString("en-US", {
-    weekday: "long",
+    weekday: "short",
   });
 };

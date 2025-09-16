@@ -1,5 +1,5 @@
 "use client";
-import { ChevronRight } from "lucide-react";
+import { ChevronRightIcon, LoaderCircleIcon } from "lucide-react";
 import { handleTextareaSubmission } from "./actions";
 import { cn } from "@/lib/utils";
 import { useState, useTransition } from "react";
@@ -68,10 +68,9 @@ const mockClothingRecommendation: ClothingRecommendationType[] = [
 
 export default function Home() {
   const [isPending, startTransition] = useTransition();
-  const [location, setLocation] = useState("Los Angeles");
-  const [clothingRecommendation, setClothingRecommendation] = useState<
-    ClothingRecommendationType[]
-  >(mockClothingRecommendation);
+  const [location, setLocation] = useState("");
+  const [clothingRecommendation, setClothingRecommendation] =
+    useState<ClothingRecommendationType[]>();
   const [alternatives, setAlternatives] = useState<string[]>([
     "Seattle",
     "San Francisco",
@@ -88,10 +87,8 @@ export default function Home() {
         const result = await handleTextareaSubmission(formData);
         if (result?.success) {
           console.log("Location processed successfully!", result.data);
-          setMessage({
-            type: "success",
-            text: "Location processed successfully!",
-          });
+          setLocation(result.data.location);
+          setClothingRecommendation(result.data.clothingRecommendation);
         } else if (result?.error) {
           setMessage({ type: "error", text: result.error });
         }
@@ -104,53 +101,13 @@ export default function Home() {
     });
   };
 
+  const hasError = message?.type === "error";
+
   return (
     <div className="max-w-lg mx-auto mt-8">
       <p className="mb-4 font-bold">Where do you live?</p>
 
-      {message && (
-        <div
-          className={cn(
-            "mb-4 p-4 rounded-lg border",
-            message.type === "success"
-              ? "bg-green-50 border-green-200 text-green-800"
-              : "bg-red-50 border-red-200 text-red-800"
-          )}
-        >
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              {message.type === "success" ? (
-                <svg
-                  className="h-5 w-5 text-green-400"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  className="h-5 w-5 text-red-400"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              )}
-            </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium">{message.text}</p>
-            </div>
-          </div>
-        </div>
-      )}
+      {hasError && <p className="text-red-500">{message?.text}</p>}
 
       <form
         action={handleSubmit}
@@ -174,25 +131,31 @@ export default function Home() {
             "disabled:opacity-50 disabled:cursor-not-allowed"
           )}
         >
-          <ChevronRight className="size-4" />
+          {isPending ? (
+            <LoaderCircleIcon className="size-4 animate-spin" />
+          ) : (
+            <ChevronRightIcon className="size-4" />
+          )}
         </button>
       </form>
 
       {location && (
-        <div className="mt-4">
+        <div className="my-4">
           <p>{translations.locationGuess(location)}</p>
           <p>{translations.recommendationTitle}</p>
         </div>
       )}
-      <div className="mt-4 space-y-4">
-        {clothingRecommendation &&
-          clothingRecommendation.map((recommendation) => (
-            <ClothingRecommendation
-              key={recommendation.date}
-              {...recommendation}
-            />
-          ))}
-      </div>
+      {clothingRecommendation?.length && clothingRecommendation.length > 0 && (
+        <div className="mt-4 space-y-8">
+          {clothingRecommendation &&
+            clothingRecommendation.map((recommendation) => (
+              <ClothingRecommendation
+                key={recommendation.date}
+                {...recommendation}
+              />
+            ))}
+        </div>
+      )}
     </div>
   );
 }

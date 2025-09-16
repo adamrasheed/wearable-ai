@@ -1,19 +1,24 @@
 "use client";
 
 import { FC } from "react";
-import { type ClothingRecommendation as ClothingRecommendationType } from "@/types";
+import {
+  Clothing,
+  type ClothingRecommendation as ClothingRecommendationType,
+} from "@/types";
 import { cn, formatDate, getDayOfWeek } from "@/lib/utils";
 
-const RecommendationItem: FC<{ label: string; value: string }> = ({
-  label,
-  value,
-}) => {
+type RecommendationItemProps = {
+  label: keyof Clothing;
+  value: string;
+};
+
+const RecommendationItem: FC<RecommendationItemProps> = ({ label, value }) => {
   return (
-    <div className="p-2 rounded-md bg-slate-900">
-      <p className="text-sm text-gray-500 all-small-caps leading-none mb-2">
+    <div>
+      <p className="rounded-md w-fit bg-slate-100 dark:bg-slate-800 pt-1 pb-1.5 px-2 text-sm text-gray-600  dark:text-gray-300 all-small-caps leading-none mb-2">
         {label}
       </p>
-      {value}
+      <div className="px-2">{value}</div>
     </div>
   );
 };
@@ -22,19 +27,19 @@ const ClothingRecommendation: FC<
   ClothingRecommendationType & { className?: string }
 > = ({ clothing, date, className }) => {
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn("space-y-2 px-4 md:px-0", className)}>
       <p className="text-sm text-gray-500 all-small-caps font-bold">
-        {getDayOfWeek(date)}
+        {`${getDayOfWeek(date)} ${formatDate(date)}`}
       </p>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-2">
         {clothing.casual && (
-          <RecommendationItem label="Casual" value={clothing.casual} />
+          <RecommendationItem label="casual" value={clothing.casual} />
         )}
         {clothing.work && (
-          <RecommendationItem label="Work" value={clothing.work} />
+          <RecommendationItem label="work" value={clothing.work} />
         )}
         {clothing.formal && (
-          <RecommendationItem label="Formal" value={clothing.formal} />
+          <RecommendationItem label="formal" value={clothing.formal} />
         )}
       </div>
     </div>
