@@ -30,4 +30,12 @@ export type ClothingRecommendation = {
   date: string;
   clothing: Clothing;
   rationale: string;
+  weatherIconId: string; // e.g., "01d"
+  temperature: number;
+};
+
+export type LocationResponse = {
+  city: string;
+  alternatives: string[];
+  clothingRecommendation: ClothingRecommendation[];
 };

@@ -4,9 +4,10 @@ import {
   CityGuess,
   OpenWeatherForecastResponse,
 } from "@/types";
+import { env } from "@/lib/env";
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: env.OPENAI_API_KEY,
 });
 
 export async function inferCityFromText(userText: string): Promise<CityGuess> {
@@ -49,9 +50,9 @@ export async function getClothingRecommendation(
   You are a helpful assistant that recommends clothing based on the weather.
   You are given a JSON object with the weather data.
   You need to recommend the clothing based on the weather data for each of the provided days.
-  Provided recommendations for a casual, work, and formal outfit.
+  Provided recommendations for a color-coordinatedcasual, work, and formal outfit, all describing the brand of the clothing, and the type of clothing. Along with the temperature and weather icon id.
   Return ONLY valid JSON (no markdown, no code blocks) with: date (YYYY-MM-DD format), clothing (object with casual, work, formal properties), rationale (one sentence).
-  Example format: [{"date": "2024-01-15", "clothing": {"casual": "Wear a light jacket", "work": "Business casual with light layers", "formal": "Suit with light jacket"}, "rationale": "It's a sunny day with mild temperatures"}, {"date": "2024-01-16", "clothing": {"casual": "Wear a raincoat", "work": "Waterproof jacket over business attire", "formal": "Formal raincoat or umbrella"}, "rationale": "It's a rainy day with precipitation expected"}]}
+  Example format: [{"date": "2024-01-15", "clothing": {"casual": "Wear a light beige canvas jacket from Madewell, a pair of 501 light blue jeans from Levi's, a white Tshirt for Sunspel, and a pair of white sneakers from Adidas.", "work": "Business casual with a light blue Oxford shirt from Ralph Lauren, a pair of chinos from Levi's, and a pair of black dress shoes from Allen Edmonds.", "formal": "Suit with light jacket"}, "rationale": "It's a sunny day with mild temperatures", "temperature": 70, "weatherIconId": "01d"}, {"date": "2024-01-16", "clothing": {"casual": "Wear a raincoat", "work": "Waterproof jacket over business attire", "formal": "Formal raincoat or umbrella"}, "rationale": "It's a rainy day with precipitation expected", "temperature": 50, "weatherIconId": "10d"}]}
   `;
 
   console.log("Getting clothing recommendation for:", weatherData);
@@ -75,8 +76,6 @@ export async function getClothingRecommendation(
       .replace(/```json\n?/g, "")
       .replace(/```\n?/g, "")
       .trim();
-
-    console.log("Cleaned response:", cleanedResponse);
 
     const parsedResponse = JSON.parse(
       cleanedResponse

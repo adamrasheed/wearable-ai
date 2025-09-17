@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { BASE_URL_OPENWEATHER_ICON } from "./constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -64,6 +65,10 @@ export const formatDate = (date: string) => {
 
 export const getDayOfWeek = (date: string) => {
   return new Date(date).toLocaleDateString("en-US", {
-    weekday: "short",
+    weekday: "long",
   });
+};
+
+export const getWeatherIconUrl = (iconId: string) => {
+  return `${BASE_URL_OPENWEATHER_ICON}${iconId}@2x.png`;
 };

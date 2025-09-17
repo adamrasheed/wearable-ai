@@ -1,8 +1,23 @@
 "use server";
 
+import { LocationResponse } from "@/types";
 import { getValidatedString } from "../lib/utils";
+import { env } from "@/lib/env";
 
-export async function handleTextareaSubmission(formData: FormData) {
+type Result =
+  | {
+      success: false;
+      error?: string;
+      data?: never;
+    }
+  | {
+      success: true;
+      data: LocationResponse;
+    };
+
+export async function handleTextareaSubmission(
+  formData: FormData
+): Promise<Result> {
   const inputValue = getValidatedString(formData, "location");
 
   if (!inputValue) {
@@ -14,7 +29,7 @@ export async function handleTextareaSubmission(formData: FormData) {
   }
 
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const baseUrl = env.NEXT_PUBLIC_BASE_URL;
     const response = await fetch(`${baseUrl}/api/location`, {
       method: "POST",
       headers: {
@@ -50,17 +65,15 @@ export async function handleTextareaSubmission(formData: FormData) {
       }
     }
 
-    const weatherData = await response.json();
+    const data = await response.json();
 
-    // Return success response
     return {
       success: true,
-      data: weatherData,
+      data: data,
     };
   } catch (error) {
     console.error("Error fetching weather data:", error);
 
-    // Handle network errors
     if (error instanceof TypeError && error.message.includes("fetch")) {
       return {
         success: false,
