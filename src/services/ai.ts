@@ -20,15 +20,19 @@ If ambiguous, pick the best guess but keep confidence low and include alternativ
 Example format: {lat: '34.052235', lon: '-118.243683', "city": "Los Angeles", "region": "California", "country": "USA", "confidence": 0.9, "rationale": "Mention of celebrities suggests Hollywood area", "alternatives": [{ lat: '37.774929', lon: '-122.419416', "city": "San Francisco", "region": "California", "country": "USA", "confidence": 0.8, "rationale": "Mention of Golden Gate Bridge suggests San Francisco area"}, { lat: '40.712776', lon: '-74.005974', "city": "New York", "region": "New York", "country": "USA", "confidence": 0.7, "rationale": "Mention of Broadway suggests New York area"}]}`;
 
   try {
-    const completion = await openai.responses.create({
+    const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
-      input: [
+      messages: [
         { role: "system", content: system },
         { role: "user", content: userText },
       ],
     });
 
-    const response = completion.output_text;
+    const response = completion.choices[0]?.message?.content;
+
+    if (!response) {
+      throw new Error("No response from OpenAI");
+    }
 
     const cleanedResponse = response
       .replace(/```json\n?/g, "")
@@ -62,15 +66,19 @@ export async function getClothingRecommendation(
   }
 
   try {
-    const completion = await openai.responses.create({
+    const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
-      input: [
+      messages: [
         { role: "system", content: system },
         { role: "user", content: JSON.stringify(weatherData) },
       ],
     });
 
-    const response = completion.output_text;
+    const response = completion.choices[0]?.message?.content;
+
+    if (!response) {
+      throw new Error("No response from OpenAI");
+    }
 
     const cleanedResponse = response
       .replace(/```json\n?/g, "")

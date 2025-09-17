@@ -51,9 +51,11 @@ const ClothingRecommendation: FC<ClothingRecommendationProps> = ({
           src={getWeatherIconUrl(weatherIconId)}
           alt={weatherIconId}
         />
-        <p className="text-lg pb-0.5">
-          {translations.degrees(Number(temperature.toFixed(0)))}
-        </p>
+        {temperature && (
+          <p className="text-lg pb-0.5">
+            {translations.degrees(Number(temperature.toFixed(0)))}
+          </p>
+        )}
       </div>
       <p className="text-sm text-gray-500">{rationale}</p>
       <div className="flex items-center gap-2"></div>
