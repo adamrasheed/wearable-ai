@@ -69,7 +69,7 @@ export async function handleTextareaSubmission(
 
     return {
       success: true,
-      data: data,
+      data,
     };
   } catch (error) {
     console.error("Error fetching weather data:", error);

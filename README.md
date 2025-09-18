@@ -2,12 +2,13 @@
 
 A Next.js application that provides intelligent weather-based clothing recommendations using AI. Simply describe your location in natural language, and get personalized clothing suggestions based on the weather forecast.
 
+## Working Website: [Click here](https://wearable-ai-lake.vercel.app/)
+
 ## Features
 
-- 🌍 **Smart Location Detection**: Describe your location naturally (e.g., "near the Golden Gate Bridge", "downtown Seattle")
+- 🌍 **Smart Location Detection**: Describe your location naturally (e.g., "near the Golden Gate Bridge", "downtown Seattle", or "I love having carne asada burritos after surfing")
 - 🌤️ **Weather Integration**: Real-time weather data from OpenWeather API
 - 👕 **AI-Powered Recommendations**: Get clothing suggestions for casual, work, and formal occasions
-- 📱 **Responsive Design**: Works seamlessly on desktop and mobile devices
 
 ## Getting Started
 
@@ -20,13 +21,7 @@ A Next.js application that provides intelligent weather-based clothing recommend
 
 ### Environment Setup
 
-1. **Create a `.env.local` file** in the root directory:
-
-```bash
-cp .env.example .env.local
-```
-
-2. **Add your API keys** to `.env.local`:
+1. **Add your API keys** to `.env.local`:
 
 ```env
 # Required: OpenWeather API Key
@@ -44,25 +39,13 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000
 3. **Install dependencies**:
 
 ```bash
-npm install
-# or
 yarn install
-# or
-pnpm install
-# or
-bun install
 ```
 
 4. **Run the development server**:
 
 ```bash
-npm run dev
-# or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 5. **Open your browser** and navigate to [http://localhost:3000](http://localhost:3000)
@@ -111,17 +94,12 @@ src/
 └── types/                 # TypeScript type definitions
 ```
 
-## Learn More
+### Project Improvements
 
-To learn more about Next.js, take a look at the following resources:
+I spent around 4 hours building this out, most of the time being used to determine the final data model of the recommendations. If I were to spend more time on the project, I'd work on the following:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Adding the calculated weather lat and lon to the browser url query parameters so that we can persist the location data on reload, and on reload it would only require a single call to the OpenAI api
+- Adding auth and creating creating a database that adds the users locations
+- Utilizing Redis for the location cache, would should speed things up, especially as more users add in more locations
+- Adding actual items of clothing from a marketplace, and allowing a user to upvote teh recommendations. We would then add the user-liked items (along with metdata such as the weather it was recommended for etc) on the db and the nuse that to recommend similar items in future forecasted reccomendations
+- Limit tries to only 10/queries per day for fee users. Add $5/month subscription fee for higher usage. Premium features could also include adding users favorite brands during sign up for more personalized recommendations
